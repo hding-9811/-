@@ -1,6 +1,7 @@
 from rest_framework import serializers, exceptions
 
 from app.models import Book, Press
+from app2.models import User
 
 
 class PressModelSerializer(serializers.ModelSerializer):
@@ -90,7 +91,7 @@ class BookModelSerializerV2(serializers.ModelSerializer):
         fields = ("book_name", "price", "publish", "authors", "pic")
 
         # 未修改多个图书对象提供 ListSerializer
-        list_serializer_class = BookListSerializer
+        # list_serializer_class = BookListSerializer
 
         # 添加DRF所提供的检验规则
         # 通过此参数指定哪些字段是参与序列化的 哪些字段是参数与反序列化的
@@ -138,3 +139,25 @@ class BookModelSerializerV2(serializers.ModelSerializer):
         if price > 90:
             raise exceptions.ValidationError("超过设定的最高价钱")
         return attrs
+
+
+class UserSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = User
+
+        fields = ('username', 'password')
+
+        extra_kwargs = {
+            'username': {
+                "required": True,
+                "min_length": 6,
+                "error_messages": {
+                    "required": "用户名是必填的",
+                    "min_length": "长度不够,必须是六位数"
+                }
+            },
+            "password":{
+                "write_only":True
+            }
+
+        }
