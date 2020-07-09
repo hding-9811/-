@@ -1,12 +1,13 @@
 <template>
     <div class="footer">
-        <ul v-for="(nav,index) in nav_list" :key="index">
-            <li v-if="nav.position==2">{{nav.title}}</li>
-<!--            <li>联系我们</li>-->
-<!--            <li>百知教育</li>-->
-<!--            <li>帮助中心</li>-->
-<!--            <li>意见反馈</li>-->
-<!--            <li>新手指南</li>-->
+        <ul>
+
+            <li v-for="(nav,index) in nav_list" :key="index"><a href="" v-if="nav.position==2">{{nav.title}}</a></li>
+            <!--                        <li>联系我们</li>-->
+            <!--                        <li>百知教育</li>-->
+            <!--                        <li>帮助中心</li>-->
+            <!--                        <li>意见反馈</li>-->
+            <!--                        <li>新手指南</li>-->
         </ul>
     </div>
 </template>
@@ -34,7 +35,7 @@
         },
         created() {
             this.get_all_nav()
-            console.log(this.nav_list)
+
         }
     }
 </script>

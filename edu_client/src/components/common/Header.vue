@@ -6,7 +6,7 @@
                     <router-link to="/"><img src="/static/image/logo.png" alt=""></router-link>
                 </div>
                 <ul class="nav full-left" v-for="(nav,index) in nav_list" :key="index">
-                    <li v-if="(nav.position == '1')"><span>{{nav.title}}</span></li>
+                    <li v-if="(nav.position == '1')"><a :href="nav.link"><span>{{nav.title}}</span></a></li>
 
                 </ul>
                 <div class="login-bar full-right">
@@ -15,9 +15,9 @@
                         <span><router-link to="/cart">购物车</router-link></span>
                     </div>
                     <div class="login-box full-left">
-                        <span>登录</span>
+                        <router-link to="/login">登录</router-link>
                         &nbsp;|&nbsp;
-                        <span>注册</span>
+                        <router-link>注册</router-link>
                     </div>
                 </div>
             </div>
@@ -44,10 +44,15 @@
                 }).catch(error => {
                     console.log(error)
                 })
+            },
+            //获取 token
+            get_token(){
+                this.token = localStorage.user_token || sessionStorage.user_token;
             }
         },
         created() {
-            this.get_all_nav()
+            this.get_all_nav();
+            this.get_token();
 
         }
     }

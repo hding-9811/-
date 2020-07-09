@@ -19,6 +19,9 @@ Vue.prototype.$settings = settings;
 //全局css
 import "../static/css/global.css"
 
+//导入极验
+// import "../static/js/gt.js"
+import "../static/js/gt"
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
