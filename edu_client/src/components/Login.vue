@@ -24,7 +24,7 @@
                     </div>
                     <button class="login_btn btn btn-primary" @click="get_captcha">登录</button>
                     <p class="go_login">没有账号
-                        <router-link to="/user/register/">立即注册</router-link>
+                        <router-link to="/register">立即注册</router-link>
                     </p>
                 </div>
                 <div class="inp" v-show="">
@@ -143,7 +143,20 @@
                     this.$message.error("用户名或密码错误")
                 })
 
+            },
+            // 自动填充账号密码
+            get_token() {
+                let tokens = localStorage.getItem("user_token")
+                if (tokens) {
+                    this.username = localStorage.getItem("username")
+
+                }
             }
+        },
+        created() {
+            this.get_token()
+
+
         }
     }
 </script>

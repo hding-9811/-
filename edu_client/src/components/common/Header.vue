@@ -9,15 +9,27 @@
                     <li v-if="(nav.position == '1')"><a :href="nav.link"><span>{{nav.title}}</span></a></li>
 
                 </ul>
-                <div class="login-bar full-right">
+                <div class="login-bar full-right" v-if="token">
                     <div class="shop-cart full-left">
                         <img src="/static/image/" alt="">
                         <span><router-link to="/cart">购物车</router-link></span>
                     </div>
                     <div class="login-box full-left">
-                        <router-link to="/login">登录</router-link>
+                        <router-link to="/home/login/">个人中心</router-link>
                         &nbsp;|&nbsp;
-                        <router-link>注册</router-link>
+<!--                        <router-link to="/login" @click="clear_token">退出登录</router-link>-->
+                            <span><a href="javascript:void (0)" @click="clear_token">退出登录</a></span>
+                    </div>
+                </div>
+                <div class="login-bar full-right" v-else>
+                    <div class="shop-cart full-left">
+                        <img src="/static/image/" alt="">
+                        <span><router-link to="/cart">购物车</router-link></span>
+                    </div>
+                    <div class="login-box full-left">
+                        <router-link to="/login" >登录</router-link>
+                        &nbsp;|&nbsp;
+                        <router-link to="/register">注册</router-link>
                     </div>
                 </div>
             </div>
@@ -31,6 +43,9 @@
         data() {
             return {
                 nav_list: [],
+                token: '',
+                login:"登录"
+
             }
         },
         methods: {
@@ -48,6 +63,16 @@
             //获取 token
             get_token(){
                 this.token = localStorage.user_token || sessionStorage.user_token;
+            },
+            //退出登录
+            clear_token(){
+                localStorage.clear();
+                sessionStorage.clear()
+                this.$router.push('/login')
+                this.$message({
+                    message: '退出登录成功',
+                    type: 'success'
+                });
             }
         },
         created() {
