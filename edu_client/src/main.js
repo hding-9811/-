@@ -24,6 +24,13 @@ import "../static/css/global.css"
 import "../static/js/gt"
 Vue.config.productionTip = false;
 
+//配置视频播放
+require('video.js/dist/video-js.css');
+require('vue-video-player/src/custom-theme.css');
+import VideoPlayer from 'vue-video-player'
+
+Vue.use(VideoPlayer)
+
 /* eslint-disable no-new */
 new Vue({
     el: '#app',

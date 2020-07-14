@@ -6,9 +6,17 @@
                     <router-link to="/"><img src="/static/image/logo.png" alt=""></router-link>
                 </div>
                 <ul class="nav full-left" v-for="(nav,index) in nav_list" :key="index">
-                    <li v-if="(nav.position == '1')"><a :href="nav.link"><span>{{nav.title}}</span></a></li>
+                    <li v-if="(nav.position == '1')">
+                        <!--                        项目外部链接-->
+                        <span v-if="nav.is_site"><a :href="nav.link">{{nav.title}}</a></span>
+                        <!--                        项目内部链接-->
+
+                        <span v-else><router-link :to="nav.link">{{nav.title}}</router-link></span>
+                    </li>
 
                 </ul>
+
+                <!--                用户存在-->
                 <div class="login-bar full-right" v-if="token">
                     <div class="shop-cart full-left">
                         <img src="/static/image/" alt="">
@@ -17,8 +25,8 @@
                     <div class="login-box full-left">
                         <router-link to="/home/login/">个人中心</router-link>
                         &nbsp;|&nbsp;
-<!--                        <router-link to="/login" @click="clear_token">退出登录</router-link>-->
-                            <span><a href="javascript:void (0)" @click="clear_token">退出登录</a></span>
+                        <!--                        <router-link to="/login" @click="clear_token">退出登录</router-link>-->
+                        <span><a href="javascript:void (0)" @click="clear_token">退出登录</a></span>
                     </div>
                 </div>
                 <div class="login-bar full-right" v-else>
@@ -27,7 +35,7 @@
                         <span><router-link to="/cart">购物车</router-link></span>
                     </div>
                     <div class="login-box full-left">
-                        <router-link to="/login" >登录</router-link>
+                        <router-link to="/login">登录</router-link>
                         &nbsp;|&nbsp;
                         <router-link to="/register">注册</router-link>
                     </div>
@@ -44,14 +52,14 @@
             return {
                 nav_list: [],
                 token: '',
-                login:"登录"
+                login: "登录"
 
             }
         },
         methods: {
             get_all_nav() {
                 this.$axios({
-                    url: this.$settings.HOST+"home/nav/",
+                    url: this.$settings.HOST + "home/nav/",
                     method: "get",
                 }).then(res => {
 
@@ -61,11 +69,11 @@
                 })
             },
             //获取 token
-            get_token(){
+            get_token() {
                 this.token = localStorage.user_token || sessionStorage.user_token;
             },
             //退出登录
-            clear_token(){
+            clear_token() {
                 localStorage.clear();
                 sessionStorage.clear()
                 this.$router.push('/login')
