@@ -15,7 +15,7 @@ Including another URLconf
 """
 import xadmin
 
-from django.urls import path,re_path,include
+from django.urls import path, re_path, include
 from django.views.static import serve
 from django.conf import settings
 from xadmin.plugins import xversion
@@ -26,7 +26,9 @@ urlpatterns = [
     # path('admin/', admin.site.urls),
     path('admin/', xadmin.site.urls),
     re_path(r'media/(?P<path>.*)', serve, {'document_root': settings.MEDIA_ROOT}),
-    path("home/",include("home.urls")),
-    path("user/",include("user.urls"))
+    path("home/", include("home.urls")),
+    path("user/", include("user.urls")),
+    path("course/", include("course.urls")),
+    path("ckeditor/", include("ckeditor_uploader.urls")),
 
 ]

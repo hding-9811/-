@@ -48,9 +48,15 @@ INSTALLED_APPS = [
     "xadmin",
     'crispy_forms',
     'reversion',
+    "django_filters",
 
     'home',
-    "user"
+    "user",
+    "course",
+
+    # 富文本编辑器
+    'ckeditor',  # 富文本编辑器
+    'ckeditor_uploader',  # 富文本编辑器的上传模块
 
 ]
 
@@ -92,7 +98,7 @@ WSGI_APPLICATION = 'edu_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': "edu_db",
+        'NAME': "edu_dd",
         "HOST": "127.0.0.1",
         "USER": "root",
         "PASSWORD": '123456',
@@ -213,15 +219,13 @@ JWT_AUTH = {
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'user.utils.jwt_response_payload_handler',
 }
 
-# 自定义
+# 自定义用户模型格式必须是app.表明
 AUTH_USER_MODEL = "user.UserInfo"
-
 
 # 自定义多条件登录
 AUTHENTICATION_BACKENDS = [
     'user.utils.UserAuthBackend',
 ]
-
 
 # django 连接redis设置
 CACHES = {
@@ -247,3 +251,14 @@ CACHES = {
         }
     },
 }
+
+
+# devlope 配置
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',	# 展示哪些工具栏
+        'height': 300,	# 编辑器的高度
+        # 'width': 300,
+    },
+}
+CKEDITOR_UPLOAD_PATH = ''
