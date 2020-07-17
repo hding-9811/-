@@ -33,7 +33,7 @@
 
 from rest_framework.serializers import ModelSerializer
 
-from course.models import CourseCategory, Course, Teacher, CourseChapter,CourseLesson
+from course.models import CourseCategory, Course, Teacher, CourseChapter, CourseLesson
 
 
 class CourseCategorySerializer(ModelSerializer):
@@ -64,13 +64,19 @@ class CourseModelSerializer(ModelSerializer):
     # 序列化器嵌套查询老师信息
     teacher = CourseTeacherSerializer()
 
+    '''
+    discount_name:返回前台活动所需要的名称
+    '''
+
     class Meta:
         model = Course
         fields = ["id", "name", "course_img", "students", "lessons",
-                  "pub_lessons", "price", "teacher", "lesson_list"]
+                  "pub_lessons", "price", "teacher", "lesson_list", "discount_name",
+                  "real_price"]
 
 
 class CourseOneSerializer(ModelSerializer):
+    """ """
     teacher = CourseTeacherModelSerializer()
 
     class Meta:
@@ -78,7 +84,8 @@ class CourseOneSerializer(ModelSerializer):
 
         fields = [
             'id', 'name', 'course_img', 'students', 'lessons', 'pub_lessons', 'course_type',
-            'price', 'teacher', 'level_name', 'course_video','brief_html'
+            'price', 'teacher', 'level_name', 'course_video', 'brief_html', "discount_name",
+            "real_price","active_time"
         ]
 
 
@@ -88,7 +95,7 @@ class CourseLessonSerializer(ModelSerializer):
     class Meta:
         model = CourseLesson
         fields = [
-             'name', 'section_link', 'id', 'free_trail'
+            'name', 'section_link', 'id', 'free_trail'
         ]
 
 

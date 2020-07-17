@@ -43,12 +43,14 @@ class CourseFilterListAPIView(ListAPIView):
 
 
 class CourseOneRetrieveAPIView(RetrieveAPIView):
+    """查询课程详情"""
     queryset = Course.objects.filter(is_show=True, is_delete=False)
     serializer_class = CourseOneSerializer
     lookup_field = 'id'
 
 
 class CourseChapterAPIvie(ListAPIView):
+    """查询章节课时"""
     queryset = CourseChapter.objects.filter(is_show=True, is_delete=False)
 
     serializer_class = CourseChapterSerializer

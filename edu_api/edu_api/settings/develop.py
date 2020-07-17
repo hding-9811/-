@@ -50,9 +50,11 @@ INSTALLED_APPS = [
     'reversion',
     "django_filters",
 
+    "cart",
     'home',
     "user",
     "course",
+
 
     # 富文本编辑器
     'ckeditor',  # 富文本编辑器
@@ -135,7 +137,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -214,7 +216,7 @@ REST_FRAMEWORK = {
 # jwt配置
 JWT_AUTH = {
     # 有效时间
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=300),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=60*60),
     # 自定义jwt返回值的格式方法
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'user.utils.jwt_response_payload_handler',
 }
@@ -250,14 +252,25 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
-}
 
+    # 购物车存储位置
+    "cart": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        # 连接的redis所在服务的端口以及ip
+        "LOCATION": "redis://127.0.0.1:6379/9",
+        # 使用客户端的方式
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+
+    }
+}
 
 # devlope 配置
 CKEDITOR_CONFIGS = {
     'default': {
-        'toolbar': 'full',	# 展示哪些工具栏
-        'height': 300,	# 编辑器的高度
+        'toolbar': 'full',  # 展示哪些工具栏
+        'height': 300,  # 编辑器的高度
         # 'width': 300,
     },
 }
