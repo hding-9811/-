@@ -18,14 +18,16 @@
                 </div>
                 <div class="wrap-right">
                     <h3 class="course-name">{{course.name}}</h3>
-                    <p class="data">{{course.students}}人在学&nbsp;&nbsp;&nbsp;&nbsp;课程总时长：{{course.lessons}}课时/{{course.lessons==course.pub_lessons?'更新完成':`已更新${course.pub_lessons}课时`}}&nbsp;&nbsp;&nbsp;&nbsp;难度：{{course.level}}</p>
+                    <p class="data">{{course.students}}人在学&nbsp;&nbsp;&nbsp;&nbsp;课程总时长：{{course.lessons}}课时/{{course.lessons==course.pub_lessons?'更新完成':`已更新${course.pub_lessons}课时`}}&nbsp;&nbsp;&nbsp;&nbsp;难度：{{course.level_name}}</p>
                     <div class="sale-time">
-                        <p class="sale-type">限时免费</p>
-                        <p class="expire">距离结束：仅剩 110天 13小时 33分 <span class="second">08</span> 秒</p>
+                        <p class="sale-type">{{course.discount_name}}</p>
+                        <p class="expire">距离结束：仅剩 {{parseInt(course.active_time/(24*3600))}}天
+                            {{parseInt(course.active_time/3600%24)}}小时 {{parseInt(course.active_time/60%60)}}分 <span
+                                class="second">{{course.active_time%60}}</span> 秒</p>
                     </div>
                     <p class="course-price">
                         <span>活动价</span>
-                        <span class="discount">¥0.00</span>
+                        <span class="discount">¥{{course.real_price}}</span>
                         <span class="original">¥{{course.price}}</span>
                     </p>
                     <div class="buy">
@@ -33,7 +35,8 @@
                             <button class="buy-now">立即购买</button>
                             <button class="free">免费试学</button>
                         </div>
-                        <div class="add-cart"><img src="/static/image/cart-yellow.svg" alt="">加入购物车</div>
+                        <div class="add-cart" @click="addCart"><img src="/static/image/cart-yellow.svg" alt="">加入购物车
+                        </div>
                     </div>
                 </div>
             </div>
@@ -49,7 +52,7 @@
             <div class="course-content">
                 <div class="course-tab-list">
                     <div class="tab-item" v-if="tabIndex==1">
-                        <div v-html="course.brief_html"> </div>
+                        <div v-html="course.brief_html"></div>
                         <p><img alt=""
                                 src=""
                                 width="840"></p>
@@ -150,6 +153,50 @@
             }
         },
         methods: {
+            check_user_login() {
+                let token = localStorage.user_token || sessionStorage.user_id
+
+                if (!token) {
+                    let self = this;
+                    this.$confirm("对不器，请登录后在添加购物车", {
+                        callback() {
+                            self.$router.push("/login");
+                        }
+                    });
+                    return false
+
+                }
+                return token
+            },
+
+            // 添加商品到购物车
+            addCart() {
+                //
+                let token = this.check_user_login();
+                //添加商品发起请求
+
+                this.$axios({
+                    url: this.$settings.HOST + "cart/option/",
+                    method: "post",
+                    data: {
+                        course_id: this.ids
+                    },
+                    headers: {
+                        //提交token 必须在请求头生民token jwt必须有空格
+                        "Authorization": "jwt " + token
+                    }
+
+                }).then(res => {
+                    console.log(res.data);
+                    this.$message.success(res.data.message)
+                    this.$store.commit("add_cart", res.data.cart_length)
+
+
+                }).catch(error => {
+                    console.log(error.response);
+                })
+            },
+
             //获取课程信息
             get_course_list(id) {
 
@@ -163,6 +210,17 @@
                     //播放的视频
                     this.playerOptions.sources[0].src = res.data.course_video;
                     this.playerOptions.poster = res.data.coures_image
+
+                    // 设置课程活动的倒计时
+                    if (this.course.active_time > 0) {
+                        let timer = setInterval(() => {
+                            if (this.course.active_time > 1) {
+                                this.course.active_time -= 1
+                            }else {
+                                clearInterval(timer)
+                            }
+                        },1000)
+                    }
                 }).catch(error => {
 
                 })
