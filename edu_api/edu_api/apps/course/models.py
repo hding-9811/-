@@ -83,6 +83,7 @@ class Course(BaseModel):
 
         return data_list
 
+    @property
     def discount_name(self):
         """如果当前课程参与了活动，返回当前课程活动对应的活动名诚"""
         name = ''

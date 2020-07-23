@@ -11,7 +11,7 @@ from edu_api.libs.geetest import GeetestLib
 from edu_api.settings import constants
 from user.models import UserInfo
 from user.utils import get_user_by_account
-from utils.send_msg import Message
+
 from user.serializers import UserModelSerializer
 
 pc_geetest_id = "6f91b3d2afe94ed29da03c14988fb4ef"
@@ -62,10 +62,12 @@ class UserAPIView(CreateAPIView):
 
 class MobileCheckAPIView(APIView):
     def get(self, request, mobile):
-        print(mobile)
+        print(len(mobile))
         # 判断手机号是否被注册
-        if not re.match(r"^1[3-9\d{9]", mobile):
+        if not re.match(r"^1[3-9]\d{9}", mobile):
             return Response({"message": "手机号格式不正确"}, status=http_status.HTTP_400_BAD_REQUEST)
+        elif len(mobile) != 11:
+            return Response({"message": "手机号长度不够"}, status=http_status.HTTP_400_BAD_REQUEST)
         user = get_user_by_account(mobile)
 
         if user is not None:
@@ -99,10 +101,19 @@ class SendMessageAPIView(APIView):
 
         # 4. 调用方法  完成短信的发送
         try:
-            message = Message(constants.API_KEY)
-            message.send_message(mobile, code)
+
+            # 通过celery异步只想发送短信
+            from my_task.sms.tasks import send_sms
+            send_sms.delay(mobile, code)
+            # message = Message(constants.API_KEY)
+            # message.send_message(mobile, code)
         except:
             return Response({"message": "短信发送失败"}, status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # 5. 响应回去
         return Response({"message": "发送短信成功"}, status=http_status.HTTP_200_OK)
+
+
+
+
+

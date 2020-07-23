@@ -4,5 +4,8 @@ from cart import views
 
 urlpatterns = [
     path('option/', views.CartView.as_view(
-        {"post": "add_cart", "get": "list_cart", "patch": "change_select", "delete": "delete_course","put":"change_expire"}))
+        {"post": "add_cart", "get": "list_cart", "patch": "change_select", "delete": "delete_course",
+         "put": "change_expire"})),
+
+    path("opp/", views.CartView.as_view({"get": "get_select_course"})),
 ]

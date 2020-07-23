@@ -30,6 +30,8 @@ urlpatterns = [
     path("user/", include("user.urls")),
     path("course/", include("course.urls")),
     path("ckeditor/", include("ckeditor_uploader.urls")),
-    path('cart/',include("cart.urls"))
+    path('cart/',include("cart.urls")),
+    path("order/",include("order.urls")),
+    path("payments/",include("payments.urls")),
 
 ]

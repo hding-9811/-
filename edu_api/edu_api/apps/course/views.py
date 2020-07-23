@@ -1,7 +1,6 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
-from rest_framework.response import Response
 
 from course.models import CourseCategory, Course, CourseChapter
 from course.pagination import CoursePageNumber
@@ -19,13 +18,6 @@ class CourseListAPIView(ListAPIView):
     """课程列表查询"""
     queryset = Course.objects.filter(is_show=True, is_delete=False).order_by("orders")
     serializer_class = CourseModelSerializer
-    # get_object = "id"
-
-    # def get(self, request, *args, **kwargs):
-    #     course_list = self.get_object()
-    #     data_ser = self.get_serializer(course_list, many=True)
-    #     data = data_ser.data
-    #     return Response(data)
 
 
 class CourseFilterListAPIView(ListAPIView):

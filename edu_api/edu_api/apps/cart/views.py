@@ -67,16 +67,16 @@ class CartView(ViewSet):
         user_id = request.user.id
         # user_id = 2
         redis_connection = get_redis_connection("cart")
-        cart_list = redis_connection.hgetall("cart_%s" % user_id)
-        select_list = redis_connection.smembers('selected_%s' % user_id)
-        print('cart_list', cart_list)
-        print(select_list, "sele")
+        cart_list_bytes = redis_connection.hgetall("cart_%s" % user_id)
+        select_list_bytes = redis_connection.smembers('selected_%s' % user_id)
+        print('cart_list', cart_list_bytes)
+        print(select_list_bytes, "sele")
 
         # 循环从mysql中找出商品的信息
         data = []
-        for course_id, expire_id in cart_list.items():
-            course_id = int(course_id)
-            expire_id = int(expire_id)
+        for course_id_byte, expire_id_byte in cart_list_bytes.items():
+            course_id = int(course_id_byte)
+            expire_id = int(expire_id_byte)
             try:
                 # 获取到所有的课程信息
                 course = Course.objects.get(is_show=True, is_delete=False, pk=course_id)
@@ -84,7 +84,7 @@ class CartView(ViewSet):
                 continue
             # 将购物车所需要的信息返回
             data.append({
-                'selected': True if course_id in select_list else False,
+                'selected': True if course_id_byte in select_list_bytes else False,
                 "course_img": constants.IMAGE_SRC + course.course_img.url,
                 "name": course.name,
                 "expire_id": expire_id,
@@ -106,7 +106,8 @@ class CartView(ViewSet):
         # selected = request.data.get("selected")
 
         course_id = request.data.get("course_id")
-        print(course_id)
+        print(user_id, course_id, selected)
+
         try:
             Course.objects.get(is_show=True, is_delete=False, id=course_id)
         except:
@@ -146,10 +147,10 @@ class CartView(ViewSet):
         user_id = request.user.id
         expire_id = request.data.get("expire_id")
         course_id = request.data.get("course_id")
-        print(expire_id,course_id)
+        print(expire_id, course_id)
 
         try:
-            course = Course.objects.get(is_show=True,is_delete=False,id=course_id)
+            course = Course.objects.get(is_show=True, is_delete=False, id=course_id)
             if expire_id > 0:
                 expire_iem = CourseExpire.objects.get(is_show=True, is_delete=False, id=expire_id)
                 if not expire_iem:
@@ -163,4 +164,68 @@ class CartView(ViewSet):
 
         real_price = course.real_expire_price(expire_id)
 
-        return Response({"message":"切换有效期成功","real_price":real_price})
+        return Response({"message": "切换有效期成功", "real_price": real_price})
+
+    def get_select_course(self, request):
+        """获取购物车中已勾选的商品 返回前端所需的数据"""
+        user_id = request.user.id
+        redis_connection = get_redis_connection("cart")
+
+        # 获取当前登录用户的购物车中的所有商品
+
+        cart_list = redis_connection.hgetall("cart_%s" % user_id)
+        select_list = redis_connection.smembers("selected_%s" % user_id)
+
+        total_price = 0
+
+        data = []
+        for course_id_byte, expire_id_byte in cart_list.items():
+            course_id = int(course_id_byte)
+            expire_id = int(expire_id_byte)
+
+            # 判断商品id是否在已勾选的列表中
+            if course_id_byte in select_list:
+
+                try:
+                    # 获取 到所有课程的信息
+                    course = Course.objects.get(is_show=True, is_delete=False, pk=course_id)
+                except Course.DoesNotExist:
+                    continue
+
+                # 如果有效期的id 大于0 则需要计算商品价格 id不大于0 则代表永久有效
+
+                original_price = course.price
+                expire_text = "永久有效"
+
+                try:
+                    if expire_id > 0:
+                        course_expire = CourseExpire.objects.get(id=expire_id)
+                        # 对应有效期的价格
+                        original_price = course_expire.price
+
+                        expire_text = course_expire.expire_text
+                except CourseExpire.DoesNotExist:
+                    pass
+
+                # 根据已勾选的商品的对应有效期的价格计算勾选的商品最终价格
+
+                real_expire_price = course.real_expire_price(expire_id)
+
+                # 将购物车所需的信息返回
+
+                data.append({
+                    "course_img": constants.IMAGE_SRC + course.course_img.url,
+                    "name": course.name,
+                    "id": course.id,
+                    # 活动、有效期计算完成后的真实价格
+                    "real_price": "%.2f" % float(real_expire_price),
+                    # 原价
+                    "price": original_price,
+                    "expire_text": expire_text,
+                    "discount_name": course.discount_name,
+                })
+
+                # 商品叠加后的总价
+                total_price += float(real_expire_price)
+
+        return Response({"message": "获取成功", "total_price": total_price, "course_list": data})

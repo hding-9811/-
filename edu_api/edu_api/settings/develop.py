@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     'home',
     "user",
     "course",
+    "order",
+    "payments",
 
 
     # 富文本编辑器
@@ -216,7 +218,7 @@ REST_FRAMEWORK = {
 # jwt配置
 JWT_AUTH = {
     # 有效时间
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=60*60),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=60*6000),
     # 自定义jwt返回值的格式方法
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'user.utils.jwt_response_payload_handler',
 }
@@ -275,3 +277,19 @@ CKEDITOR_CONFIGS = {
     },
 }
 CKEDITOR_UPLOAD_PATH = ''
+
+
+# 支付宝付款配置信息
+ALIAPY_CONFIG = {
+    # "gateway_url": "https://openapi.alipay.com/gateway.do?", # 真实支付宝网关地址
+    "gateway_url": "https://openapi.alipaydev.com/gateway.do?",  # 沙箱支付宝网关地址
+    "appid": "2016102200738366",
+    "app_notify_url": None,
+    "app_private_key_path": open(os.path.join(BASE_DIR, "apps/payments/keys/app_private_key.pem")).read(),
+    "alipay_public_key_path": open(os.path.join(BASE_DIR, "apps/payments/keys/app_private_key.pem")).read(),
+    "sign_type": "RSA2",
+    "debug": False,
+    # "return_url": "http://www.baizhistore.cn:8080/payments/result",  # 同步回调地址
+    "return_url": "http://localhost:8080/payments/result",  # 同步回调地址
+    "notify_url": "http://api.baizhistore.cn:8000/payments/result",  # 异步结果通知
+}
