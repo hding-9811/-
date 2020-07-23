@@ -26,7 +26,7 @@
                     url: this.$settings.HOST + "home/nav/",
                     method: "get",
                 }).then(res => {
-                    console.log(res.data)
+
                     this.nav_list = res.data
                 }).catch(error => {
                     console.log(error)

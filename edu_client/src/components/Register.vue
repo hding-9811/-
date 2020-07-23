@@ -9,7 +9,7 @@
                     <input v-model="password" type="password" placeholder="登录密码" class="user">
                     <div id="geetest"></div>
                     <div class="sms-box">
-                        <input v-model="code" type="text" maxlength="6" placeholder="输入验证码" class="user">
+                        <input v-model="code" type="text" maxlength="6" placeholder="获取验证码" class="user">
                         <div class="sms-btn" @click="get_code">{{sms_text}}</div>
                     </div>
                     <button class="register_btn" @click="user_register">注册</button>
@@ -65,7 +65,7 @@
                     })
                 }).catch(error => {
                     console.log(error.response);
-                    this.$message.error("注册失败")
+                    this.$message.error("用户名已存在")
                 })
             },
             // 向后台发起用户请求 注册用户
@@ -74,9 +74,15 @@
                     url: this.$settings.HOST + "user/mobile/" + `${this.mobile}`,
                     method: "get",
 
+                }).then(res=>{
+                    if (res.data.message == "ok"){
+                        this.$message.success("用户名可用")
+                    }else {
+                        this.$message.error(res.data.message)
+                    }
                 }).catch(error => {
                     console.log(error.response.data)
-                    // this.$message.error(error.response)
+                    this.$message.error(error.response.data.message)
                 })
             },
             get_code() {

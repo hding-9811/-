@@ -19,7 +19,7 @@
                 <div class="wrap-right">
                     <h3 class="course-name">{{course.name}}</h3>
                     <p class="data">{{course.students}}人在学&nbsp;&nbsp;&nbsp;&nbsp;课程总时长：{{course.lessons}}课时/{{course.lessons==course.pub_lessons?'更新完成':`已更新${course.pub_lessons}课时`}}&nbsp;&nbsp;&nbsp;&nbsp;难度：{{course.level_name}}</p>
-                    <div class="sale-time">
+                    <div class="sale-time" v-show="falge">
                         <p class="sale-type">{{course.discount_name}}</p>
                         <p class="expire">距离结束：仅剩 {{parseInt(course.active_time/(24*3600))}}天
                             {{parseInt(course.active_time/3600%24)}}小时 {{parseInt(course.active_time/60%60)}}分 <span
@@ -32,7 +32,9 @@
                     </p>
                     <div class="buy">
                         <div class="buy-btn">
-                            <button class="buy-now">立即购买</button>
+                            <button class="buy-now" @click="addCart">
+                                <router-link :to="'/cart/order/'+`${course.id}`" >立即购买</router-link>
+                            </button>
                             <button class="free">免费试学</button>
                         </div>
                         <div class="add-cart" @click="addCart"><img src="/static/image/cart-yellow.svg" alt="">加入购物车
@@ -78,12 +80,7 @@
                                     <p class="time">07:30 <img src="/static/image/chapter-player.svg"></p>
                                     <button class="try">立即试学</button>
                                 </li>
-                                <li class="lesson-item">
-                                    <p class="name"><span class="index">1-2</span> Vue的双向绑定<span class="free">免费</span>
-                                    </p>
-                                    <p class="time">07:30 <img src="/static/image/chapter-player.svg"></p>
-                                    <button class="try">立即试学</button>
-                                </li>
+
                             </ul>
                         </div>
                         <
@@ -129,6 +126,7 @@
                 course: {
                     teacher: {}
                 },
+                falge: false,
                 chapter: [],
                 tabIndex: 2, // 当前选项卡显示的下标
                 playerOptions: {
@@ -154,7 +152,7 @@
         },
         methods: {
             check_user_login() {
-                let token = localStorage.user_token || sessionStorage.user_id
+                let token = localStorage.user_token || sessionStorage.user_token;
 
                 if (!token) {
                     let self = this;
@@ -213,13 +211,14 @@
 
                     // 设置课程活动的倒计时
                     if (this.course.active_time > 0) {
+                        this.falge = true
                         let timer = setInterval(() => {
                             if (this.course.active_time > 1) {
                                 this.course.active_time -= 1
-                            }else {
+                            } else {
                                 clearInterval(timer)
                             }
-                        },1000)
+                        }, 1000)
                     }
                 }).catch(error => {
 
@@ -245,7 +244,10 @@
                 }).catch(error => {
                     this.$message.error("获取信息失败")
                 })
-            }
+            },
+
+
+
 
         },
         components: {

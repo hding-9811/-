@@ -15,15 +15,16 @@
                     <span class="do_more">操作</span>
                 </div>
                 <div class="cart_course_list">
-                    <CartItem v-for="(course,index) in cart_list" :key="index" :course="course"></CartItem>
+                    <CartItem v-for="(course,index) in cart_list" :key="index" :course="course" @delete_course="del_cart(index)" @change_selected="get_total_price"></CartItem>
 
 
                 </div>
                 <div class="cart_footer_row">
-                    <span class="cart_select"><label> <el-checkbox v-model="checked"></el-checkbox><span>全选</span></label></span>
+                    <span class="cart_select"><label> <el-checkbox
+                        v-model="checked"></el-checkbox><span>全选</span></label></span>
                     <span class="cart_delete"><i class="el-icon-delete"></i> <span>删除</span></span>
-                    <span class="goto_pay">去结算</span>
-                    <span class="cart_total">总计：¥0.0</span>
+                    <span class="goto_pay"><router-link to="/cart/order">去结算</router-link></span>
+                    <span class="cart_total">总计：¥{{total_price}}</span>
                 </div>
             </div>
         </div>
@@ -38,18 +39,21 @@
 
     export default {
         name: "Cart",
-        data(){
-            return{
-                checked:"",
-                cart_list:[],
+        data() {
+            return {
+                checked: "",
+                cart_list: [],
+                total_price: ""
             }
         },
-        components:{
-            CartItem,Header,Footer
+        components: {
+            CartItem, Header, Footer
         },
         methods: {
+
+            // 判断是否登录
             check_user_login() {
-                let token = localStorage.user_token || sessionStorage.user_id
+                let token = localStorage.user_token || sessionStorage.user_token;
 
                 if (!token) {
                     let self = this;
@@ -64,27 +68,61 @@
                 return token
             },
 
-            get_cart(){
+            get_cart() {
                 //获取购物车判断用户是否已经登录
                 let token = this.check_user_login()
-                this.$axios.get(`${this.$settings.HOST}cart/option/`,{
-                    headers:{
-                        "Authorization":"jwt " + token
+                this.$axios.get(`${this.$settings.HOST}cart/option/`, {
+                    headers: {
+                        "Authorization": "jwt " + token
 
                     }
-                }).then(res=>{
+                }).then(res => {
                     console.log(res.data)
 
-                    this.cart_list =res.data
-                    this.$store.commit("add_cart",this.cart_list.length);
-                }).catch(error=>{
+                    this.cart_list = res.data
+                    this.$store.commit("add_cart", this.cart_list.length);
+                    this.get_total_price()
+                }).catch(error => {
                     console.log(error.response)
                 })
-            }
+            },
+            //
+            get_total_price() {
+                let total = 0;
+                this.cart_list.forEach((course, key) => {
+                    //判断购物车的商品是否被选中
+                    if (course.selected) {
+                        total += parseFloat(course.real_price)
+                    }
+                    this.total_price = total
+                    console.log(this.total_price)
+
+                })
+            },
+
+            //删除购物车商品
+
+            del_cart(key){
+                console.log(key)
+                this.cart_list.splice(key,1)
+                // 删除后更新购物车熟练
+                this.$store.commit("add_cart" ,this.cart_list.length);
+
+                // 删除后更新总价
+                this.get_total_price()
+
+            },
+
         },
         created() {
             this.get_cart()
-        }
+
+
+        },
+
+
+
+
     }
 </script>
 

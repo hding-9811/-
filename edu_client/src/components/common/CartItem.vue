@@ -15,8 +15,8 @@
 
             </el-select>
         </div>
-        <div class="cart_column column_4">¥{{course.price.toFixed(2)}}</div>
-        <div class="cart_column column_4"><a href="javascript:void (0)" @click="delete_course">删除</a></div>
+        <div class="cart_column column_4">¥{{course.real_price}}</div>
+        <div class="cart_column column_4"><a href="javascript:void (0)" @click="delete_course" >删除</a></div>
     </div>
 </template>
 
@@ -40,7 +40,7 @@
 
             //切换状态
             change_selected() {
-                let token = localStorage.user_token || sessionStorage.user_id
+                let token = localStorage.user_token || sessionStorage.user_token;
                 this.$axios.patch(`${this.$settings.HOST}cart/option/`, {
                     selected: this.course.selected,
                     course_id: this.course.id,
@@ -49,16 +49,19 @@
                         "Authorization": "jwt " + token
                     }
                 }).then(res => {
-                    this.$message.success(res.data.message)
+                    this.$message.success(res.data.message);
+                    this.$emit("change_selected")
+
+                    console.log(course.selected)
 
                 }).catch(error => {
-                    this.$message.error(error.response)
+                    console.log(error)
                 })
             },
 
             //删除
             delete_course() {
-                let token = localStorage.user_token || sessionStorage.user_id
+                let token = localStorage.user_token || sessionStorage.user_token;
                 this.$axios({
                     url: this.$settings.HOST + "cart/option/",
                     method: "delete",
@@ -70,12 +73,23 @@
                         "Authorization": "jwt " + token
                     }
                 }).then(res => {
-                    this.$message.success(res.data.message)
+                    this.$message.success(res.data.message);
+                    // 计算总价格
+                    this.$emit("delete_course")
                 }).catch(error => {
                     this.$message.error(error.response)
                 })
             },
 
+            del_course(){
+                let token = localStorage.user_token || sessionStorage.user_token
+                this.$axios.delete(`${this.$settings.HOST}cart/option/`,{
+
+
+                })
+
+            },
+            // 切换有效期
             change_expire() {
                 let token = sessionStorage.user_token || localStorage.user_token
                 this.$axios({
@@ -92,6 +106,7 @@
                     console.log(res.data)
                     this.course.real_price = res.data.real_price;
                     this.$message.success("切换有效期成功")
+                    this.$emit("change_selected")
 
                 }).catch(error=>{
                     console.log(error)
